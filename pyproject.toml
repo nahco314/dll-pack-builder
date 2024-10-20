@@ -9,6 +9,9 @@ dependencies = [
     "typer>=0.12.5",
 ]
 
+[project.scripts]
+dll-pack-builder = "dll_pack_builder.main:main"
+
 [tool.uv]
 dev-dependencies = [
     "ruff>=0.7.0",
