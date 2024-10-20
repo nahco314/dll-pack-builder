@@ -19,7 +19,7 @@ app = typer.Typer()
 def find(path: Path) -> None:
     for p in path.iterdir():
         if p.is_file() and (
-            p.suffix == ".so" or p.suffix == ".dll" or p.suffix == ".dylib"
+            p.suffix == ".so" or p.suffix == ".dll" or p.suffix == ".dylib" or p.suffix == ".wasm"
         ):
             print(p)
             break
@@ -44,6 +44,26 @@ def local(
 ) -> None:
     if include is None:
         include = []
+
+    if "wasm" in target_triple:
+        shutil.copy(dll, output / f"{target_triple}.{dll.name}")
+
+        json_content = {
+            "spec-version": "1.0.0",
+            "manifest": {
+                "platforms": {
+                    target_triple: {
+                        "name": dll.name,
+                        "url": f"https://github.com/{gh_repo}/releases/download/{gh_tag}/{target_triple}.{dll.name}",
+                    }
+                }
+            },
+        }
+
+        with open(output / f"{name}.{target_triple}.dllpack-local", "w") as f:
+            json.dump(json_content, f, indent=4)
+
+        return
 
     dll_infos = {}
     st = [dll]
