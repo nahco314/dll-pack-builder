@@ -14,6 +14,14 @@ app = typer.Typer()
 
 
 @app.command()
+def find(path: Path) -> None:
+    for p in path.iterdir():
+        if p.is_file() and (p.suffix == ".so" or p.suffix == ".dll" or p.suffix == ".dylib"):
+            print(p)
+            break
+
+
+@app.command()
 def local(dll: Path, output: Path, target_triple: str, gh_tag: str) -> None:
     dll_infos = {}
     st = [dll]
