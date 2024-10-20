@@ -109,7 +109,7 @@ def local(
         else:
             l_name = p.name
 
-        with open(output / f"{l_name}.dllpack-local", "w") as f:
+        with open(output / f"{l_name}.{target_triple}.dllpack-local", "w") as f:
             json.dump(json_content, f, indent=4)
 
 
