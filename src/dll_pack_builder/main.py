@@ -2,7 +2,9 @@ import json
 import os
 import sys
 from collections import defaultdict
-from typing import Any
+from typing import Any, Optional, List
+import globre
+from typing_extensions import Annotated
 import lddwrap
 import typer
 from pathlib import Path
@@ -16,13 +18,32 @@ app = typer.Typer()
 @app.command()
 def find(path: Path) -> None:
     for p in path.iterdir():
-        if p.is_file() and (p.suffix == ".so" or p.suffix == ".dll" or p.suffix == ".dylib"):
+        if p.is_file() and (
+            p.suffix == ".so" or p.suffix == ".dll" or p.suffix == ".dylib"
+        ):
             print(p)
             break
 
 
+def matches(patterns: List[str], path: Path) -> bool:
+    for pattern in patterns:
+        if globre.match(pattern, str(path)):
+            return True
+    return False
+
+
 @app.command()
-def local(dll: Path, output: Path, target_triple: str, gh_repo: str, gh_tag: str) -> None:
+def local(
+    dll: Path,
+    output: Path,
+    target_triple: str,
+    gh_repo: str,
+    gh_tag: str,
+    include: Annotated[Optional[List[str]], typer.Option()] = None,
+) -> None:
+    if include is None:
+        include = []
+
     dll_infos = {}
     st = [dll]
 
@@ -47,6 +68,9 @@ def local(dll: Path, output: Path, target_triple: str, gh_repo: str, gh_tag: str
 
             # if it is virtual so, we don't care
             if d.path is None:
+                continue
+
+            if not matches(include, d.path):
                 continue
 
             st.append(d.path)
