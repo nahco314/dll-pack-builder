@@ -102,7 +102,8 @@ def merge(output: Path) -> None:
     rm_list = []
 
     for p in output.iterdir():
-        if m := re.fullmatch(r"(.*)\.(.*?)\.dllpack-local", p.name):
+        m = re.fullmatch(r"(.*)\.(.*?)\.dllpack-local", p.name)
+        if m:
             object_merge(dllpack_locals[m.group(1)], json.load(p.open()))
             rm_list.append(p)
 
