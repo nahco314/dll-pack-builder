@@ -34,6 +34,7 @@ def matches(patterns: List[str], path: Path) -> bool:
 
 @app.command()
 def local(
+    name: str,
     dll: Path,
     output: Path,
     target_triple: str,
@@ -102,7 +103,13 @@ def local(
                 }
             )
 
-        with open(output / f"{p.name}.{target_triple}.dllpack-local", "w") as f:
+        l_name: str
+        if p == dll:
+            l_name = name
+        else:
+            l_name = p.name
+
+        with open(output / f"{l_name}.dllpack-local", "w") as f:
             json.dump(json_content, f, indent=4)
 
 
