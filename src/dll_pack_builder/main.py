@@ -22,7 +22,7 @@ def find(path: Path) -> None:
 
 
 @app.command()
-def local(dll: Path, output: Path, target_triple: str, gh_tag: str) -> None:
+def local(dll: Path, output: Path, target_triple: str, gh_repo: str, gh_tag: str) -> None:
     dll_infos = {}
     st = [dll]
 
@@ -64,7 +64,7 @@ def local(dll: Path, output: Path, target_triple: str, gh_tag: str) -> None:
                 "platforms": {
                     target_triple: {
                         "name": p.name,
-                        "url": f"https://github.com/nahco314/onefmt-rustfmt/releases/download/{gh_tag}/{target_triple}.{p.name}",
+                        "url": f"https://github.com/{gh_repo}/releases/download/{gh_tag}/{target_triple}.{p.name}",
                         "dependencies": [],
                     }
                 }
@@ -75,7 +75,7 @@ def local(dll: Path, output: Path, target_triple: str, gh_tag: str) -> None:
             json_content["manifest"]["platforms"][target_triple]["dependencies"].append(
                 {
                     "type": "dllpack",
-                    "url": f"https://github.com/nahco314/onefmt-rustfmt/releases/download/{gh_tag}/{dep.path.name}.dllpack",
+                    "url": f"https://github.com/{gh_repo}/releases/download/{gh_tag}/{dep.path.name}.dllpack",
                 }
             )
 
