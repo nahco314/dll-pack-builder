@@ -38,7 +38,7 @@ def local(dll: Path, output: Path, target_triple: str, gh_tag: str) -> None:
 
         for d in deps:
             if not d.found:
-                print(f"not found: {d.path}", file=sys.stderr)
+                print(f"not found: {d.soname}", file=sys.stderr)
                 print(
                     "try specifying the library path in an environment variable such as LD_LIBRARY_PATH",
                     file=sys.stderr,
