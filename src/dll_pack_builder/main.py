@@ -55,8 +55,7 @@ def local(dll: Path, output: Path, target_triple: str, gh_repo: str, gh_tag: str
         dll_infos[p] = use_deps
 
     for p, deps in dll_infos.items():
-        if p.parent != output:
-            shutil.copy(p, output)
+        shutil.copy(p, output / f"{target_triple}.{p.name}")
 
         json_content = {
             "spec-version": "1.0.0",
