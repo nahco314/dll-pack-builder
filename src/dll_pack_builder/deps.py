@@ -81,12 +81,11 @@ def resolve_deps_macos(
                 continue
 
             if not dep_path.exists():
-                if str(dep_path.absolute()).startswith("/usr/lib"):
-                    # maybe system library
-                    # todo: we should use https://github.com/keith/dyld-shared-cache-extractor to check
-                    r_d = Dependency(None, dep_path.name, True)
-                else:
-                    r_d = Dependency(None, dep_path.name, False)
+                print("warning: not found", dep_path, file=sys.stderr)
+
+                # maybe system library
+                # todo: we should use https://github.com/keith/dyld-shared-cache-extractor to check
+                r_d = Dependency(None, dep_path.name, True)
             else:
                 r_d = Dependency(dep_path, dep_path.name, True)
 
