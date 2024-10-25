@@ -77,6 +77,9 @@ def resolve_deps_macos(
                 dep.name, rpath, loader_path, executable_path
             )
 
+            if dep_path.name == path.name:
+                continue
+
             if not dep_path.exists():
                 if str(dep_path.absolute()).startswith("/usr/lib"):
                     # maybe system library
