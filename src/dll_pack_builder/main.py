@@ -5,12 +5,12 @@ from collections import defaultdict
 from typing import Any, Optional, List
 import globre
 from typing_extensions import Annotated
-import lddwrap
 import typer
 from pathlib import Path
 import shutil
 import re
 
+from dll_pack_builder.deps import resolve_deps
 
 app = typer.Typer()
 
@@ -19,7 +19,10 @@ app = typer.Typer()
 def find(path: Path) -> None:
     for p in path.iterdir():
         if p.is_file() and (
-            p.suffix == ".so" or p.suffix == ".dll" or p.suffix == ".dylib" or p.suffix == ".wasm"
+            p.suffix == ".so"
+            or p.suffix == ".dll"
+            or p.suffix == ".dylib"
+            or p.suffix == ".wasm"
         ):
             print(p)
             break
@@ -41,6 +44,9 @@ def local(
     gh_repo: str,
     gh_tag: str,
     include: Annotated[Optional[List[str]], typer.Option()] = None,
+    macho_rpath: Annotated[Optional[Path], typer.Option()] = None,
+    macho_loader_path: Annotated[Optional[Path], typer.Option()] = None,
+    macho_executable_path: Annotated[Optional[Path], typer.Option()] = None,
 ) -> None:
     if include is None:
         include = []
@@ -75,12 +81,12 @@ def local(
         if p in dll_infos:
             continue
 
-        deps = lddwrap.list_dependencies(p)
+        deps = resolve_deps(p, macho_rpath, macho_loader_path, macho_executable_path)
         use_deps = []
 
         for d in deps:
             if not d.found:
-                print(f"not found: {d.soname}", file=sys.stderr)
+                print(f"not found: {d.name}", file=sys.stderr)
                 print(
                     "try specifying the library path in an environment variable such as LD_LIBRARY_PATH",
                     file=sys.stderr,
