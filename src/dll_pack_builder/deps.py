@@ -18,7 +18,7 @@ def resolve_deps_linux(path: Path) -> List[Dependency]:
     raw_deps = lddwrap.list_dependencies(path)
     res = []
     for dep in raw_deps:
-        res.append(Dependency(dep.path, dep.found, dep.soname))
+        res.append(Dependency(dep.path, dep.soname, dep.found))
 
     return res
 
