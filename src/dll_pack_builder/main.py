@@ -29,8 +29,9 @@ def find(path: Path) -> None:
 
 def matches(patterns: List[str], path: Path) -> bool:
     for pattern in patterns:
-        if globre.match(pattern, str(path)):
+        if globre.match(pattern, str(path).replace("\\", "/")):
             return True
+
     return False
 
 
@@ -46,6 +47,7 @@ def local(
     macho_rpath: Optional[Path] = None,
     macho_loader_path: Optional[Path] = None,
     macho_executable_path: Optional[Path] = None,
+    win_path: Optional[str] = None,
 ) -> None:
     if include is None:
         include = []
@@ -80,7 +82,7 @@ def local(
         if p in dll_infos:
             continue
 
-        deps = resolve_deps(p, macho_rpath, macho_loader_path, macho_executable_path)
+        deps = resolve_deps(p, macho_rpath, macho_loader_path, macho_executable_path, win_path)
         use_deps = []
 
         for d in deps:

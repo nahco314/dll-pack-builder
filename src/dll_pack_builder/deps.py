@@ -1,10 +1,11 @@
+import os
 import sys
 from dataclasses import dataclass
 from typing import Optional, List
 from pathlib import Path
 import lddwrap
-import globre
 import lief
+import pefile
 
 
 @dataclass
@@ -94,16 +95,50 @@ def resolve_deps_macos(
     return res
 
 
+def windows_find_dll(name: str, additional_path: Optional[str]) -> Optional[Path]:
+    paths = os.environ["PATH"].split(os.pathsep)
+    if additional_path is not None:
+        paths.extend(additional_path.split(os.pathsep))
+
+    for path in paths:
+        potential_path = os.path.join(path, name)
+        if os.path.isfile(potential_path):
+            return potential_path
+
+    return None
+
+
+def resolve_deps_windows(
+    path: Path,
+    additional_path: Optional[str]
+) -> List[Dependency]:
+    res = []
+    pe = pefile.PE(path)
+
+    for entry in getattr(pe, "DIRECTORY_ENTRY_IMPORT", []):
+        dep_name = entry.dll.decode()
+        dep_path = windows_find_dll(dep_name, additional_path)
+        if dep_path is None:
+            res.append(Dependency(None, dep_name, False))
+        else:
+            res.append(Dependency(Path(dep_path), dep_name, True))
+
+    return res
+
+
 def resolve_deps(
     path: Path,
     rpath: Optional[Path],
     loader_path: Optional[Path],
     executable_path: Optional[Path],
+    win_path: Optional[str],
 ) -> List[Dependency]:
     if sys.platform == "linux":
         return resolve_deps_linux(path)
     elif sys.platform == "darwin":
         return resolve_deps_macos(path, rpath, loader_path, executable_path)
+    elif sys.platform == "win32":
+        return resolve_deps_windows(path, win_path)
     else:
         print(f"unsupported platform: {sys.platform}", file=sys.stderr)
         sys.exit(1)
