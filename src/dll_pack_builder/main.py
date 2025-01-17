@@ -4,15 +4,14 @@ import sys
 from collections import defaultdict
 from typing import Any, Optional, List
 import globre
-from typing_extensions import Annotated
-import typer
+import cyclopts
 from pathlib import Path
 import shutil
 import re
 
 from dll_pack_builder.deps import resolve_deps
 
-app = typer.Typer()
+app = cyclopts.App()
 
 
 @app.command()
@@ -43,10 +42,10 @@ def local(
     target_triple: str,
     gh_repo: str,
     gh_tag: str,
-    include: Annotated[Optional[List[str]], typer.Option()] = None,
-    macho_rpath: Annotated[Optional[Path], typer.Option()] = None,
-    macho_loader_path: Annotated[Optional[Path], typer.Option()] = None,
-    macho_executable_path: Annotated[Optional[Path], typer.Option()] = None,
+    include: Optional[List[str]] = None,
+    macho_rpath: Optional[Path] = None,
+    macho_loader_path: Optional[Path] = None,
+    macho_executable_path: Optional[Path] = None,
 ) -> None:
     if include is None:
         include = []
